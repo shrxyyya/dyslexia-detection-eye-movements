@@ -16,6 +16,92 @@ This project focuses on detecting dyslexia by analyzing eye-movement patterns du
 
 ---
 
+## Synthetic Data Generation
+
+### Overview
+To address the limited dataset size, we implemented a sophisticated synthetic data generation pipeline that creates realistic eye-tracking data while preserving the essential characteristics of dyslexia-related eye-movement patterns.
+
+### Generation Methodology
+
+#### Core Algorithm
+The synthetic data generation uses a perturbation-based approach implemented in `data-generator.py`:
+
+1. **Spatial Perturbation**: 
+   - Perturbs `fix_x` (horizontal fixation positions) with controlled noise
+   - Preserves `fix_y` (vertical positions) unchanged to maintain reading line alignment
+   - Uses adaptive perturbation factors (3-5% of spatial standard deviation)
+
+2. **Temporal Perturbation**:
+   - Applies conservative duration modifications (±5% variation)
+   - Maintains original temporal structure and sequence timing
+   - Preserves realistic inter-fixation intervals (saccade times)
+
+3. **Subject ID Mapping**:
+   - Original subjects: 1000-1999 range
+   - Synthetic subjects: 2000-2999 and 3000-3999 ranges
+   - Maintains clear separation between real and synthetic data
+
+#### Key Features
+- **Temporal Alignment**: Preserves reading sequence and timing patterns
+- **Spatial Realism**: Maintains reading line structure while adding natural variation
+- **Duration Consistency**: Keeps fixation durations within realistic bounds
+- **No Exact Duplicates**: Ensures synthetic data doesn't contain identical entries to real data
+
+### Quality Assurance
+
+#### Validation Pipeline
+Multiple validation scripts ensure synthetic data quality:
+
+1. **`compare-real-fake.py`**: 
+   - Detects exact and approximate matches between real and synthetic data
+   - Provides quality assessment metrics
+   - Ensures sufficient diversity in synthetic samples
+
+2. **`validate-synthetic.py`**:
+   - Statistical validation using KS-tests for distribution similarity
+   - Mean Absolute Error (MAE) analysis
+   - Pearson correlation analysis
+   - Visual distribution comparisons
+
+#### Validation Metrics
+- **KS-Test p-values**: >0.05 indicates similar distributions
+- **Correlation coefficients**: Close to 1.0 for preserved relationships
+- **MAE scores**: Low values indicate minimal deviation from real patterns
+- **Exact match detection**: Zero exact matches ensures proper diversification
+
+#### Quality Standards
+- ✓ No exact duplicates with real data
+- ✓ Preserved temporal structure and reading patterns
+- ✓ Maintained statistical distributions (p > 0.05 in KS-tests)
+- ✓ Realistic spatial and temporal variations
+- ✓ Preserved fix_y alignment for reading line consistency
+
+### Data Processing Pipeline
+
+1. **Data Cleaning** (`data-update.py`):
+   - Removes duplicates and NaN values
+   - Expands subject labels for synthetic data
+   - Creates comprehensive subject mapping
+
+2. **Synthetic Generation** (`data-generator.py`):
+   - Generates 2 synthetic subjects per real subject
+   - Applies controlled perturbations
+   - Maintains data integrity and realism
+
+3. **Quality Validation** (`compare-real-fake.py`, `validate-synthetic.py`):
+   - Comprehensive statistical validation
+   - Visual distribution analysis
+   - Duplicate detection and quality assessment
+
+### Benefits of Synthetic Data
+- **Increased Dataset Size**: 3x larger dataset (210 vs 70 subjects)
+- **Balanced Classes**: Equal representation of dyslexic and non-dyslexic subjects
+- **Preserved Patterns**: Maintains dyslexia-related eye-movement characteristics
+- **Realistic Variation**: Natural diversity without artificial artifacts
+- **Validation Framework**: Comprehensive quality assurance pipeline
+
+---
+
 ## Methodology
 
 - **Model:** Logistic Regression
@@ -73,6 +159,10 @@ This project focuses on detecting dyslexia by analyzing eye-movement patterns du
 
 - `final-data.zip` - Zip file containing original and synthetic eye-tracking data files.
 - `detection.py` - Python script implementing feature extraction, model training, evaluation, and prediction.
+- `data-generator.py` - Synthetic data generation script with perturbation-based methodology.
+- `data-update.py` - Data cleaning and subject label expansion script.
+- `compare-real-fake.py` - Quality assurance script for detecting duplicates and validating synthetic data.
+- `validate-synthetic.py` - Comprehensive statistical validation and visualization script.
 - `expanded_file.csv` - Subject labels file indicating dyslexia status.
 - `README.md` - This documentation file.
 
@@ -87,6 +177,7 @@ This project focuses on detecting dyslexia by analyzing eye-movement patterns du
   - scikit-learn
   - matplotlib
   - seaborn
+  - scipy
 
 ---
 
